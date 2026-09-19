@@ -513,34 +513,47 @@ lifelines = {
 
 def use_lifeline(q, ans):
     print("\nAvailable Lifelines:")
+    lifeline_mapping = {}
+    i = 1
     for key, val in lifelines.items():
         if val:
-            print(f"- {key}")
-    choice = input("Choose a lifeline or press Enter to skip: ").strip()
-    
-    if choice == "50:50" and lifelines["50:50"]:
-        lifelines["50:50"] = False
-        wrong = [opt[0] for opt in q["options"] if opt[0] != ans]
-        removed = random.sample(wrong, 2)
-        print("\n50:50 Lifeline: Remaining options:")
-        for opt in q["options"]:
-            if opt[0] not in removed:
-                print(opt)
-    
-    elif choice == "Audience Poll" and lifelines["Audience Poll"]:
-        lifelines["Audience Poll"] = False
-        print("Audience Poll suggests:", ans)
+            print(f"{i}. {key}")
+            lifeline_mapping[str(i)] = key
+            i += 1
+            
+    if not lifeline_mapping:
+        print("No lifelines left.")
+        return None
+        
+    choice = input("Choose a lifeline number or press Enter to skip: ").strip()
+    if not choice:
+        return None
 
-    elif choice == "Phone a Friend" and lifelines["Phone a Friend"]:
-        lifelines["Phone a Friend"] = False
-        print("Your friend thinks the answer is:", ans)
+    if choice in lifeline_mapping:
+        selected_lifeline = lifeline_mapping[choice]
+        if selected_lifeline == "50:50":
+            lifelines["50:50"] = False
+            wrong = [opt[0] for opt in q["options"] if opt[0] != ans]
+            removed = random.sample(wrong, 2)
+            print("\n50:50 Lifeline: Remaining options:")
+            for opt in q["options"]:
+                if opt[0] not in removed:
+                    print(opt)
+        
+        elif selected_lifeline == "Audience Poll":
+            lifelines["Audience Poll"] = False
+            print("Audience Poll suggests:", ans)
 
-    elif choice == "Flip the Question" and lifelines["Flip the Question"]:
-        lifelines["Flip the Question"] = False
-        print("Question flipped!\n")
-        return "flip"
+        elif selected_lifeline == "Phone a Friend":
+            lifelines["Phone a Friend"] = False
+            print("Your friend thinks the answer is:", ans)
+
+        elif selected_lifeline == "Flip the Question":
+            lifelines["Flip the Question"] = False
+            print("Question flipped!\n")
+            return "flip"
     else:
-        print("Invalid or already used lifeline.")
+        print("Invalid lifeline choice.")
     return None
 
 
